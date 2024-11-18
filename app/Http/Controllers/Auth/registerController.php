@@ -24,6 +24,6 @@ class registerController extends Controller
         return response()->json([
             'user' => $user,
             'token' => $token,
-        ]);
+        ], 201);
     }
 }

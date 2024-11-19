@@ -26,6 +26,6 @@ class loginController extends Controller
 
         return response()->json([
             'token' => $user->createToken('apitodos')->plainTextToken
-        ]);
+        ], 200);
     }
 }

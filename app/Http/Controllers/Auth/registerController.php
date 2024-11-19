@@ -13,17 +13,26 @@ class registerController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-        ]);
 
-        $token = $user->createToken('apitodos')->plainTextToken;
+    // Validasi input
+    $request->validate([
+        'name' => 'required',
+        'email' => 'required',
+        'password' => 'required',
+    ]);
+
+    // Jika validasi lolos, buat user
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+    ]);
+
+        // $token = $user->createToken('apitodos')->plainTextToken;
 
         return response()->json([
             'user' => $user,
-            'token' => $token,
+            // 'token' => $token,
         ], 201);
     }
 }

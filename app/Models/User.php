@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+//Mufid,Fadhil,Michael,Kenzie,Handika,Farrel
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -33,7 +33,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
+//Mufid,Fadhil,Michael,Kenzie,Handika,Farrel
     /**
      * Get the attributes that should be cast.
      *
@@ -47,3 +47,4 @@ class User extends Authenticatable
         ];
     }
 }
+//Mufid,Fadhil,Michael,Kenzie,Handika,Farrel

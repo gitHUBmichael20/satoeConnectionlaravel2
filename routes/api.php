@@ -13,9 +13,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/register', [RegisterController::class, 'register']);
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LogoutController::class, 'logout'])->middleware('auth:sanctum');
+Route::post('/register', registerController::class);
+Route::post('/login', loginController::class);
+Route::post('/logout', logoutController::class)->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function () {
     // Chat routes

@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class MessageController extends Controller
+class messageController extends Controller
 {
     // Ambil daftar chat/percakapan
     public function getConversations()

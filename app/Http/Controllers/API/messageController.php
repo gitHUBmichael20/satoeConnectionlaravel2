@@ -125,5 +125,23 @@ class messageController extends Controller
             'message' => 'Message marked as read'
         ]);
     }
+
+    // Menambahkan metode untuk verifikasi ID pengguna
+    public function verifyUser($id)
+    {
+        $user = User::find($id);
+    
+        if ($user) {
+            return response()->json([
+                'message' => 'User found',
+                'id' => $user->id,
+                'username' => $user->name
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'User not found'
+            ], 404);
+        }
+    }
 }
 

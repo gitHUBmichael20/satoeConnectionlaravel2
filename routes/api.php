@@ -5,7 +5,7 @@ use App\Http\Controllers\Auth\registerController;
 use App\Http\Controllers\Auth\logoutController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\MessageController;
+use App\Http\Controllers\API\messageController;
 
 
 
@@ -20,9 +20,11 @@ Route::post('/logout', logoutController::class)->middleware('auth:sanctum');
 Route::middleware('auth:sanctum')->group(function () {
     // Chat routes
     Route::prefix('messages')->group(function () {
-        Route::get('/conversations', [MessageController::class, 'getConversations']);
-        Route::get('/{userId}', [MessageController::class, 'getMessages']);
-        Route::post('/send', [MessageController::class, 'sendMessage']);
-        Route::put('/{messageId}/read', [MessageController::class, 'markAsRead']);
+        Route::get('/conversations', [messageController::class, 'getConversations']);
+        Route::get('/{userId}', [messageController::class, 'getMessages']);
+        Route::post('/send', [messageController::class, 'sendMessage']);
+        Route::put('/{messageId}/read', [messageController::class, 'markAsRead']);
     });
 });
+
+Route::get('/verify/{id}', [messageController::class, 'verifyUser']);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\logoutController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\messageController;
+use App\Http\Controllers\API\PasswordResetController;
 
 
 
@@ -26,5 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/{messageId}/read', [messageController::class, 'markAsRead']);
     });
 });
+
+// Password Reset Routes
+Route::post('password/email', [PasswordResetController::class, 'sendResetLink']);
+Route::post('password/reset', [PasswordResetController::class, 'resetPassword']);
+Route::post('password/check-token', [PasswordResetController::class, 'checkToken']);
 
 Route::get('/verify/{id}', [messageController::class, 'verifyUser']);

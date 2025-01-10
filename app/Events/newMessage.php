@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
+use Illuminate\Broadcasting\PrivateChannel;
 use App\Models\Message;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -15,18 +15,28 @@ class NewMessage implements ShouldBroadcast
 
     public $message;
 
-    public function __construct($message)
+    public function __construct(Message $message)
     {
         $this->message = $message;
     }
 
     public function broadcastOn()
     {
-        return new Channel('chat.'.$this->message->sender_id.'.'.$this->message->receiver_id);
+        return new PrivateChannel('chat.'.$this->message->sender_id.'.'.$this->message->receiver_id);
     }
 
     public function broadcastAs()
     {
-        return 'new-message'; // Nama event yang diterima oleh Pusher
+        return 'new-message';
+    }
+
+    public function broadcastWith()
+    {
+        return [
+            'id' => $this->message->id,
+            'message' => $this->message->message, // Disesuaikan dengan nama field di database
+            'sender_id' => $this->message->sender_id,
+            'created_at' => $this->message->created_at
+        ];
     }
 }

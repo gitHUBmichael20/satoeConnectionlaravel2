@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Events\NewMessage;
 
 class messageController extends Controller
 {
@@ -15,6 +16,7 @@ class messageController extends Controller
     {
         $currentUserId = Auth::id();
 
+        // Ambil percakapan yang dimiliki oleh pengguna
         $conversations = Message::where('sender_id', $currentUserId)
             ->orWhere('receiver_id', $currentUserId)
             ->select('sender_id', 'receiver_id')
@@ -26,6 +28,7 @@ class messageController extends Controller
                     ? $message->receiver_id 
                     : $message->sender_id;
 
+                // Ambil pesan terakhir dari percakapan
                 $lastMessage = Message::where(function($query) use ($currentUserId, $otherUserId) {
                     $query->where('sender_id', $currentUserId)
                           ->where('receiver_id', $otherUserId);
@@ -36,11 +39,13 @@ class messageController extends Controller
                 ->latest()
                 ->first();
 
+                // Hitung jumlah pesan belum dibaca
                 $unreadCount = Message::where('sender_id', $otherUserId)
                     ->where('receiver_id', $currentUserId)
                     ->where('is_read', false)
                     ->count();
 
+                // Ambil data pengguna lain
                 $otherUser = User::select('id', 'name')
                     ->find($otherUserId);
 
@@ -51,7 +56,9 @@ class messageController extends Controller
                     'updated_at' => $lastMessage->created_at
                 ];
             })
-            ->unique('user.id')
+            ->groupBy(function($conversation) {
+                return $conversation['user']->id; // Mengelompokkan percakapan berdasarkan ID user
+            })
             ->values();
 
         return response()->json([
@@ -59,11 +66,12 @@ class messageController extends Controller
         ]);
     }
 
-    // Ambil pesan dari specific chat
+    // Ambil pesan dari percakapan spesifik
     public function getMessages($userId)
     {
         $currentUserId = Auth::id();
         
+        // Ambil pesan dengan paginasi (misal 20 pesan per halaman)
         $messages = Message::where(function($query) use ($userId, $currentUserId) {
             $query->where('sender_id', $currentUserId)
                   ->where('receiver_id', $userId);
@@ -73,9 +81,9 @@ class messageController extends Controller
         })
         ->with(['sender:id,name', 'receiver:id,name'])
         ->orderBy('created_at', 'ASC')
-        ->get();
+        ->paginate(20); // Ganti jumlah halaman sesuai kebutuhan
 
-        // Mark messages as read
+        // Tandai pesan sebagai sudah dibaca
         Message::where('sender_id', $userId)
               ->where('receiver_id', $currentUserId)
               ->where('is_read', false)
@@ -94,6 +102,7 @@ class messageController extends Controller
             'message' => 'required|string'
         ]);
 
+        // Membuat pesan baru
         $message = Message::create([
             'sender_id' => Auth::id(),
             'receiver_id' => $request->receiver_id,
@@ -101,6 +110,10 @@ class messageController extends Controller
             'is_read' => false
         ]);
 
+        // Memicu event broadcast untuk pesan baru
+        broadcast(new NewMessage($message));
+
+        // Memuat data pengirim dan penerima untuk respons
         $message->load(['sender:id,name', 'receiver:id,name']);
 
         return response()->json([
@@ -119,6 +132,7 @@ class messageController extends Controller
             ], 403);
         }
 
+        // Update status pesan menjadi dibaca
         $message->update(['is_read' => true]);
 
         return response()->json([
@@ -144,4 +158,3 @@ class messageController extends Controller
         }
     }
 }
-
